@@ -1,0 +1,41 @@
+﻿@using LinkShorteningManager.WebApp.Models
+
+@model List<LinkViewModel>;
+@{
+    Layout = "_Layout";
+}
+
+<div class="text-center">
+    <div class="float-end mb-3">
+        <button type="button" class="btn btn-primary" id="addContactButton" onclick="location.href='@Url.Action("Addition", "Link")'">Add link</button>
+    </div>
+    <table class="table table-hover" id="contactsTable">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Url</th>
+                <th scope="col">Short url</th>
+                <th scope="col">Creation date</th>
+                <th scope="col">Click count</th>
+            </tr>
+        </thead>
+
+        <tbody id="linksList">
+            @{ var shortUrlBase = $"{Context.Request.Scheme}://{Context.Request.Host}/"; }
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                <tr id=@(Model[i].Id) ondblclick="location.href='@Url.Action("Update", "Link", new { Model[i].Id} )'">
+                    <td id=@("number" + Model[i].Id) scope="row" name="number">@(i + 1)</td>
+                    <td id=@("url" + Model[i].Id) name="url">
+                        <a href="@Model[i].Url">@Model[i].Url</a>
+                    </td>
+                    <td id=@("shortUrl" + Model[i].Id) name="shortUrl">
+                        <a href="@(shortUrlBase + Model[i].ShortKey)">@(shortUrlBase + Model[i].ShortKey)</a>
+                    </td>
+                    <td id=@("creationDate" + Model[i].Id) name="creationDate">@Model[i].CreationDate</td>
+                    <td id=@("clickCount" + Model[i].Id) name="clickCount">@Model[i].ClickCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

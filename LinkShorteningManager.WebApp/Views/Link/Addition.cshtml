@@ -1,0 +1,95 @@
+﻿@using LinkShorteningManager.WebApp.Models
+
+@model LinkViewModel;
+@{
+    <link rel="stylesheet" href="~/css/link.css" />
+    Layout = "_Layout";
+}
+
+<div class="bd-example-modal-sm">
+    <div class="modal-dialog modal-dailog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">
+                    @{string title = Model.Id == Guid.Empty ? "Addition" : "Edition";}
+                    <span>@title</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="d-none" id="linkId">@Model.Id</div>
+                <div class="form-group  mb-2">
+                    <label for="urlInput" class="col-form-label">Url:</label>
+                    <input type="text" class="form-control form-control-sm" id="urlInput" value=@Model.Url>
+                </div>
+                <label for="shortKeyInput" class="col-form-label">Key:</label>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" aria-describedby="basic-addon2" id="shortKeyInput" value=@Model.ShortKey readonly>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="getShortUrlButton">Generate</button>
+                    </div>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="clickCountInput" class="col-form-label">Click count:</label>
+                    <input type="number" class="form-control form-control-sm" id="clickCountInput" value=@(Model.ClickCount ?? 0) />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="creationDateInput" class="col-form-label">Creation date: </label>
+                    @{
+                        string? value = 
+                        Model.CreationDate == null 
+                        ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss") 
+                        : Model.CreationDate.GetValueOrDefault().ToString("yyyy-MM-ddTHH:mm:ss");
+                    }
+                    <input type="datetime-local" class="form-control form-control-sm" id="creationDateInput" value=@value />
+                </div>
+            </div>
+
+            <div class="errors" id="errorsBlock">
+                <ul id="errorList">
+                </ul>
+            </div>
+
+            <div class="modal-footer d-block text-center">
+                @if(Model.Id == Guid.Empty)
+                {
+                    <button type="button" class="btn btn-success" id="addButton">Add</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="module">
+    import * as link from '/js/link.js';
+
+    $("#addButton").on("click", e => {
+        e.preventDefault();
+        link.addLink();
+    });
+
+    $("#updateButton").on("click", e => {
+        e.preventDefault();
+        link.updateLink();
+    });
+
+    $("#deleteButton").on("click", e => {
+        e.preventDefault();
+        link.deleteLink();
+    });
+
+    $("#getShortUrlButton").on("click", e => {
+        e.preventDefault();
+        link.getShortUrl();
+    });
+
+    $("#urlInput").on("keyup", e => {
+        e.preventDefault();
+        link.resetShortUrlValue();
+    });
+</script>
