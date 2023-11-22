@@ -1,52 +1,47 @@
 ﻿using LinkShorteningManager.Repositories.Repository.Interfaces;
-using NHibernate;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace LinkShorteningManager.Repositories.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly ISession _session;
-        
+        private readonly DbContext _context;
+        private readonly DbSet<T> _dbSet;
 
 
-        public Repository(ISession session)
+
+        public Repository(DbContext context)
         {
-            _session = session;
+            _context = context;
+            _dbSet = context.Set<T>();
         }
 
-        public async Task<IList<T>> AllAsync()
+
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _session.QueryOver<T>().ListAsync();
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public async Task<IList<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> AllAsync()
         {
-            return await _session.QueryOver<T>().Where(predicate).ListAsync();
+            return await _dbSet.ToListAsync<T>();
         }
 
-        public async Task AddAsync(T entity)
+        public void Add(T entity)
         {
-            using ITransaction transaction = _session.BeginTransaction();
-
-            await _session.SaveAsync(entity);
-            await transaction.CommitAsync();
+            _context.Entry(entity).State = EntityState.Added;
         }
 
-        public async Task UpdateAsync(T entity)
+        public void Delete(T entity)
         {
-            using ITransaction transaction = _session.BeginTransaction();
-            
-            await _session.UpdateAsync(entity);
-            await transaction.CommitAsync();
+            _context.Entry(entity).State = EntityState.Deleted;
         }
 
-        public async Task DeleteAsync(T entity)
+        public void Update(T entity)
         {
-            using ITransaction transaction = _session.BeginTransaction();
-            
-            await _session.DeleteAsync(entity);
-            await transaction.CommitAsync();
+            _context.Entry(entity).State = EntityState.Modified;
         }
     }
 }

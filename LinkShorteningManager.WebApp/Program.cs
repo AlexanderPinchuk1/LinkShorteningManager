@@ -1,17 +1,20 @@
 using LinkShorteningManager.Foundation;
 using LinkShorteningManager.Foundation.Interfaces;
-using LinkShorteningManager.Repositories.Extensions;
-using LinkShorteningManager.Repositories.Repository;
-using LinkShorteningManager.Repositories.Repository.Interfaces;
-using LinkShorteningManager.WebApp.Models;
+using LinkShorteningManager.Repositories;
+using LinkShorteningManager.Repositories.UnitOfWork;
+using LinkShorteningManager.Repositories.UnitOfWork.Interfaces;
 using LinkShorteningManager.WebApp.Profiles;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddNHibernate(builder.Configuration.GetConnectionString("DefaultConnection"));
-builder.Services.AddAutoMapper(typeof(LinkMappingProfile));
+builder.Services.AddDbContext<LinkShorteningManagerDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection") ??
+        throw new InvalidOperationException("Connection string not found.")));
 
-builder.Services.AddScoped<IRepository<Link>, Repository<Link>>();
+builder.Services.AddAutoMapper(typeof(LinkMappingProfile));
+builder.Services.AddScoped<ILinkShorteningManagerUnitOfWork, LinkShorteningManagerUnitOfWork>();
 builder.Services.AddScoped<ILinkService, LinkService>();
 builder.Services.AddScoped<IRandomGenerator, RandomGenerator>();
 
