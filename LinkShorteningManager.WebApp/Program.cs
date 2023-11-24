@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<LinkShorteningManagerDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection") ??
-        throw new InvalidOperationException("Connection string not found.")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContextPool<LinkShorteningManagerDbContext>(options =>
+    options.UseMySql(
+            connectionString,
+            ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddAutoMapper(typeof(LinkMappingProfile));
 builder.Services.AddScoped<ILinkShorteningManagerUnitOfWork, LinkShorteningManagerUnitOfWork>();

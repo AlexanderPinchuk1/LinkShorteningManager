@@ -19,8 +19,6 @@ namespace LinkShorteningManager.WebApp.Models
         public void Configure(EntityTypeBuilder<Link> builder)
         {
             builder.HasKey(link => link.Id);
-            builder.Property(link => link.Id)
-                .HasDefaultValueSql("newsequentialid()");
             builder.Property(link => link.Url)
                 .IsRequired()
                 .HasMaxLength(1000);
